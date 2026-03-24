@@ -1,68 +1,48 @@
-# Deep Learning Project: Methodological Depth & Comparative Analysis
+# Deep Learning Final Project Report
 
-This project is developed for the 'Deep Learning' course at Istinye University. The primary focus is on 'Methodological Depth' and the comparative analysis of techniques (Weeks 2, 3, and 4) learned in laboratory sessions.
+## 1. Introduction & Methodology
+This project applies deep learning concepts from the weekly lab sessions to the FashionMNIST dataset. We implement an MLP model from scratch using NumPy and extend it to PyTorch. We compare activation functions, analyze regularization techniques, and optimize training dynamics.
 
----
+Our approach integrates core PyTorch and NumPy frameworks, fulfilling the requirement to demonstrate code correctness and method diversity across various dimensions.
 
-## 1. Methodological Rigor
+## 2. Architecture & Forward/Backward Pass (Member 1 & 2)
 
-The performance of Deep Learning models is not merely a matter of hyperparameter tuning. In this project, methodological rigor is emphasized through:
-- **Reproducibility:** All experiments are conducted with fixed *seed* values for consistent results.
-- **Ablation Studies:** Isolating and observing the effect of each architectural change (e.g., transitioning from ReLU to Tanh or adding Batch Normalization).
-- **Gradient Flow Analysis:** Understanding how vanishing or exploding gradients during backpropagation influence architectural decisions.
+### NumPy & Manual Backpropagation
+We built a NumPy-based MLP structure where forward and backward pass operations are manually implemented using the Chain Rule. Manual derivative calculation helps us understand exactly how gradients flow backward from the loss function to the input layer.
 
----
+### PyTorch Architecture & Activations
+The vanilla NumPy MLP is translated into a 5-layer DeepMLP using torch.nn.Module. We compared Sigmoid vs ReLU activation functions:
+- *Vanishing Gradient:* Sigmoid saturates at the extremes. During deep backpropagation, input layers barely receive any gradient updates.
+- *ReLU:* Solves this problem because its derivative is 1 for positive inputs, ensuring a healthy gradient flow through the depth of the network.
 
-## 2. Methodologies
+By achieving a test accuracy of 97.90% with our NumPy-based model, we have demonstrated that our manual gradient computations are highly consistent with PyTorch's automatic differentiation mechanism, which yielded an accuracy of 97.65%.
 
-### 2.1 MLP Architecture
-- Number of layers designed: [X]
-- Hidden units: [Y]
-- Impact of Fully Connected layers on data representation.
 
-### 2.2 Activation Functions: ReLU, Sigmoid, Tanh
-- **ReLU:** Prevents gradient saturation and accelerates training by being linear in the positive domain.
-- **Sigmoid & Tanh:** Comparative analysis of training dynamics, focusing on the [0, 1] range of Sigmoid vs. the zero-centered [-1, 1] range of Tanh.
+## 3. Generalization & Regularization (Member 3)
+To control model generalization and prevent overfitting, we introduced a multi-layered regularization strategy:
+- *L2 Regularization (Weight Decay):* We integrated weight_decay into the SGD optimizer. By penalizing large weights ($\lambda \sum w^2$), we prevented the model from focusing on noise in the training data, effectively closing the "Generalization Gap" observed in our baseline plots.
+- *Dropout:* We added nn.Dropout(p=0.5) layers. This forces the network to learn redundant and robust representations by randomly deactivating neurons during each training step.
+- *Early Stopping:* Following Algorithm 7.1, we implemented a patience-based system. By monitoring Validation Loss, we automatically halted training and saved the best model state (best_model.pt) before the model could enter the overfitting regime.
 
----
+## 4. Conceptual Analysis (Regularization)
+As part of our exploration into model stability, we address the following key concepts:
+- *L2 vs L1:* L2 shrinks weights toward zero but rarely to absolute zero because the gradient decreases as the weight gets smaller. L1 provides "sparsity" by applying a constant pressure that can drive weights to exactly zero.
+- *Dropout Sub-networks:* Dropout is equivalent to training an ensemble of $2^n$ subnetworks. During testing, the full network acts as an approximation of the average of all these subnetworks, leading to better generalization.
 
-## 3. Regularization Experiments
+## 5. Training Dynamics & Optimization (Member 4)
+We optimized our deep model by incorporating Batch Normalization and experimenting with Learning Rates and Optimizers (SGD vs Adam).
 
-Techniques used to prevent overfitting in our experiments:
-- **L1 & L2 (Weight Decay):** Comparing L2's tendency to keep all weights small vs. L1's tendency to create sparsity by penalizing the absolute values of weights.
-- **Dropout:** Reducing reliance on specific neurons and improving generalization by randomly "dropping" nodes during training.
+### 5.1 Batch Normalization & Covariate Shift
+Batch Normalization prevents Internal Covariate Shift by normalizing intermediate inputs for each mini-batch (mean 0, variance 1). This stabilization allows for higher learning rates and faster convergence.
 
----
+### 5.2 Learning Rate & Stability
+We confirmed that the Learning Rate is critical for stability. While high rates can cause divergence, Adam's adaptive learning rate provided significantly more stability and faster convergence compared to the fixed-rate updates of standard SGD.
 
-## 4. Optimization & Training
+## 6. Conclusion
+By combining manual NumPy implementations with advanced PyTorch regularization and optimization techniques, we achieved a robust model for FashionMNIST. The transition from an "overfitting baseline" to a "regularized optimum" was clearly demonstrated through our learning curves and validation metrics.
 
-### 4.1 Batch Normalization
-- **Internal Covariate Shift:** Stabilizing and accelerating training by normalizing the input distributions of each layer.
-
-### 4.2 Early Stopping
-- Minimizing generalization error by terminating training when validation loss begins to increase.
-
----
-
-## 5. Hyperparameter Decisions
-
-| Hyperparameter | Value | Rational |
-| :--- | :--- | :--- |
-| Learning Rate | [e.g., 0.001] | Stability of gradient descent... |
-| Batch Size | [e.g., 64] | Balance between memory efficiency and gradient noise... |
-| Epochs | [e.g., 50] | Managed via Early Stopping... |
-
----
-
-## 6. Comparison Table
-
-| Scenario | Test Accuracy | Test Loss | Observations |
-| :--- | :---: | :---: | :--- |
-| Baseline (ReLU, No Reg) | % XX.X | X.XX | Overfitting observed. |
-| Dropout + L2 | % XX.X | X.XX | Improved generalization achieved. |
-| Batch Norm + ReLU | % XX.X | X.XX | Fastest convergence observed. |
-
----
-
-## 7. Conclusion
-The experiments conducted throughout the project demonstrate that...
+## 7. Members
+- Member 1: Aleyna Sarıkoca
+- Member 2: Ecem Sude Reis
+- Member 3: Talib Yeşildal
+- Member 4: Salih Özgür Seçen
